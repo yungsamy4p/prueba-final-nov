@@ -1,20 +1,12 @@
 package Modelo;
 
 public class Pais {
-    private int idCiudad;
     private String nombrePais;
     private String continentePais;
     private int poblacionPais;
     private String codigoPais;
     private boolean tipoGobierno;
 
-    public int getIdCiudad() {
-        return idCiudad;
-    }
-
-    public void setIdCiudad(int idCiudad) {
-        this.idCiudad = idCiudad;
-    }
 
     public String getNombrePais() {
         return nombrePais;
@@ -58,7 +50,7 @@ public class Pais {
 
     @Override
     public String toString() {
-        return "Pais{" + "idCiudad=" + idCiudad + ", nombrePais=" + nombrePais + ", continentePais=" + continentePais + ", poblacionPais=" + poblacionPais + ", codigoPais=" + codigoPais + ", tipoGobierno=" + tipoGobierno + '}';
+        return "Pais{" + "idCiudad=" + ", nombrePais=" + nombrePais + ", continentePais=" + continentePais + ", poblacionPais=" + poblacionPais + ", codigoPais=" + codigoPais + ", tipoGobierno=" + tipoGobierno + '}';
     }
     
 }

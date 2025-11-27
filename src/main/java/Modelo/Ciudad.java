@@ -1,25 +1,16 @@
 package Modelo;
 
 public class Ciudad {
-    private int idCiudad;
     private String nombreCiudad;
     private int poblacionCiudad;
     private String codigoPais;
 
     public Ciudad(int idCiudad, String nombreCiudad, int poblacionCiudad, String codigoPais) {
-        this.idCiudad = idCiudad;
         this.nombreCiudad = nombreCiudad;
         this.poblacionCiudad = poblacionCiudad;
         this.codigoPais = codigoPais;
     }
 
-    public int getIdCiudad() {
-        return idCiudad;
-    }
-
-    public void setIdCiudad(int idCiudad) {
-        this.idCiudad = idCiudad;
-    }
 
     public String getNombreCiudad() {
         return nombreCiudad;
@@ -47,7 +38,7 @@ public class Ciudad {
 
     @Override
     public String toString() {
-        return "Ciudad{" + "idCiudad=" + idCiudad + ", nombreCiudad=" + nombreCiudad + ", poblacionCiudad=" + poblacionCiudad + ", codigoPais=" + codigoPais + '}';
+        return "Ciudad{" + "idCiudad=" + ", nombreCiudad=" + nombreCiudad + ", poblacionCiudad=" + poblacionCiudad + ", codigoPais=" + codigoPais + '}';
     }
     
 
