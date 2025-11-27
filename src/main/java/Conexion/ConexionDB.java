@@ -30,12 +30,12 @@ public class ConexionDB {
             Class.forName("com.mysql.cj.jdbc.Driver");
 
             conn = DriverManager.getConnection(CONN, USER, PASSWORD);
-            System.out.println("✅ Conexión exitosa a MySQL 8.0.33");
+            System.out.println("Conexión exitosa a MySQL 8.0.33");
         } catch (ClassNotFoundException e) {
-            System.out.println("❌ No se encontró el driver JDBC");
+            System.out.println("No se encontró el driver JDBC");
             e.printStackTrace();
         } catch (SQLException e) {
-            System.out.println("❌ Error al conectar con la base de datos");
+            System.out.println("Error al conectar con la base de datos");
             e.printStackTrace();
         }
     }

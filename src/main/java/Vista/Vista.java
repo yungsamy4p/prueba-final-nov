@@ -1,11 +1,12 @@
 package Vista;
 
-import Conexion.ConexionDB;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import DAO.PaisDAO;
+import DAO.CiudadDAO;
+import DAO.IdiomaDAO;
+import Modelo.Pais;
+import Modelo.Ciudad;
+import Modelo.Idioma;
+import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -18,23 +19,16 @@ public class Vista extends javax.swing.JFrame {
         cargarCombos(); 
     }
     
-    private void cargarCombos() {
-        try {
-            Connection con = ConexionDB.getInstancia();
-            String sql = "SELECT nombrePais FROM Pais";
-            Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery(sql);
-            
-            jComboBox1.removeAllItems();
-            jComboBox2.removeAllItems();
-            
-            while (rs.next()) {
-                String nombre = rs.getString("nombrePais");
-                jComboBox1.addItem(nombre);
-                jComboBox2.addItem(nombre);
-            }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error al cargar países: " + e.getMessage());
+private void cargarCombos() {
+        PaisDAO dao = new PaisDAO();
+        List<Pais> lista = dao.listar();
+        
+        jComboBox1.removeAllItems();
+        jComboBox2.removeAllItems();
+        
+        for (Pais p : lista) {
+            jComboBox1.addItem(p.getNombrePais());
+            jComboBox2.addItem(p.getNombrePais());
         }
     }
 
@@ -397,29 +391,19 @@ public class Vista extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnConsultarCiudadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConsultarCiudadActionPerformed
-try {
-            Connection con = ConexionDB.getInstancia();
-
-            String sql = "SELECT c.nombreCiudad, c.poblacionCiudad FROM Ciudad c " +
-                         "INNER JOIN Pais p ON c.codigoPais = p.codigoPais " +
-                         "WHERE p.nombrePais = ?";
-            
-            PreparedStatement pst = con.prepareStatement(sql);
-            pst.setString(1, jComboBox1.getSelectedItem().toString());
-            
-            ResultSet rs = pst.executeQuery();
-            
-            DefaultTableModel modelo = (DefaultTableModel) jTableCiudades.getModel();
-            modelo.setRowCount(0);
-            
-            while (rs.next()) {
-                Object[] fila = new Object[2];
-                fila[0] = rs.getString("nombreCiudad");
-                fila[1] = rs.getInt("poblacionCiudad");
-                modelo.addRow(fila);
-            }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error al consultar ciudades: " + e.getMessage());
+String paisSeleccionado = jComboBox1.getSelectedItem().toString();
+        
+        CiudadDAO dao = new CiudadDAO();
+        List<Ciudad> lista = dao.listarPorPais(paisSeleccionado);
+        
+        DefaultTableModel modelo = (DefaultTableModel) jTableCiudades.getModel();
+        modelo.setRowCount(0);
+        
+        for (Ciudad c : lista) {
+            Object[] fila = new Object[2];
+            fila[0] = c.getNombreCiudad();
+            fila[1] = c.getPoblacionCiudad();
+            modelo.addRow(fila);
         }        // TODO add your handling code here:
     }//GEN-LAST:event_btnConsultarCiudadActionPerformed
 
@@ -444,52 +428,45 @@ try {
     }//GEN-LAST:event_btnEliminarActionPerformed
 
     private void btnConsultarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConsultarActionPerformed
-try {
-            Connection con = ConexionDB.getInstancia();
-            String sql = "SELECT * FROM Pais";
-            Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery(sql);
-            
-            DefaultTableModel modelo = (DefaultTableModel) jTablePais.getModel();
-            modelo.setRowCount(0);
-            
-            while (rs.next()) {
-                Object[] fila = new Object[5];
-                fila[0] = rs.getString("codigoPais");
-                fila[1] = rs.getString("nombrePais");
-                fila[2] = rs.getString("continentePais");
-                fila[3] = rs.getInt("poblacionPais");
-
-                fila[4] = rs.getBoolean("tipoGobierno") ? "Democracia" : "Otro";
-                
-                modelo.addRow(fila);
-            }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error al consultar: " + e.getMessage());
+PaisDAO dao = new PaisDAO();
+        List<Pais> lista = dao.listar();
+        
+        DefaultTableModel modelo = (DefaultTableModel) jTablePais.getModel();
+        modelo.setRowCount(0);
+        
+        for (Pais p : lista) {
+            Object[] fila = new Object[5];
+            fila[0] = p.getCodigoPais();
+            fila[1] = p.getNombrePais();
+            fila[2] = p.getContinentePais();
+            fila[3] = p.getPoblacionPais();
+            fila[4] = p.isTipoGobierno() ? "Democracia" : "Otro";
+            modelo.addRow(fila);
         }
     }//GEN-LAST:event_btnConsultarActionPerformed
 
     private void btnCrearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCrearActionPerformed
-try {
-            Connection con = ConexionDB.getInstancia();
-            String sql = "INSERT INTO Pais (codigoPais, nombrePais, continentePais, poblacionPais, tipoGobierno) VALUES (?, ?, ?, ?, ?)";
-            PreparedStatement pst = con.prepareStatement(sql);
-            
-            pst.setString(1, txtCodigo.getText());
-            pst.setString(2, txtNombre.getText());
-            pst.setString(3, cboxContinente.getSelectedItem().toString());
-            pst.setInt(4, Integer.parseInt(txtPoblacion.getText()));
-            pst.setBoolean(5, chkTipoGobierno.isSelected());
-            
-            pst.executeUpdate();
-            JOptionPane.showMessageDialog(this, "País registrado con éxito.");
+        String cod = txtCodigo.getText();
+        String nom = txtNombre.getText();
+        String cont = cboxContinente.getSelectedItem().toString();
+        int pob = Integer.parseInt(txtPoblacion.getText());
+        boolean esDemo = chkTipoGobierno.isSelected();
+        
+
+        Pais p = new Pais(); 
+        p.setCodigoPais(cod);
+        p.setNombrePais(nom);
+        p.setContinentePais(cont);
+        p.setPoblacionPais(pob);
+        p.setTipoGobierno(esDemo);
+
+        PaisDAO dao = new PaisDAO();
+        if (dao.insertar(p)) {
+            JOptionPane.showMessageDialog(this, "País guardado.");
             cargarCombos();
             btnConsultarActionPerformed(evt);
-            
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error de SQL: " + e.getMessage());
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "La población debe ser un número entero.");
+        } else {
+            JOptionPane.showMessageDialog(this, "Error al guardar.");
         }
     }//GEN-LAST:event_btnCrearActionPerformed
 
