@@ -1,8 +1,8 @@
 package Vista;
 
-import DAO.PaisDAO;
-import DAO.CiudadDAO;
-import DAO.IdiomaDAO;
+import Controlador.PaisDAO;
+import Controlador.CiudadDAO;
+import Controlador.IdiomaDAO;
 import Modelo.Pais;
 import Modelo.Ciudad;
 import Modelo.Idioma;
@@ -408,22 +408,21 @@ String paisSeleccionado = jComboBox1.getSelectedItem().toString();
     }//GEN-LAST:event_btnConsultarCiudadActionPerformed
 
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
-try {
-            Connection con = ConexionDB.getInstancia();
-            String sql = "DELETE FROM Pais WHERE codigoPais = ?";
-            PreparedStatement pst = con.prepareStatement(sql);
-            pst.setString(1, txtCodigo.getText());
-            
-            int respuesta = JOptionPane.showConfirmDialog(this, "¿Seguro que desea eliminar el país " + txtCodigo.getText() + "?", "Confirmar", JOptionPane.YES_NO_OPTION);
-            
-            if (respuesta == JOptionPane.YES_OPTION) {
-                pst.executeUpdate();
+String codigo = txtCodigo.getText();
+        
+        int respuesta = JOptionPane.showConfirmDialog(this, 
+            "¿Seguro que desea eliminar el país " + codigo + "?", 
+            "Confirmar", JOptionPane.YES_NO_OPTION);
+
+        if (respuesta == JOptionPane.YES_OPTION) {
+            PaisDAO dao = new PaisDAO();
+            if (dao.eliminar(codigo)) {
                 JOptionPane.showMessageDialog(this, "País eliminado.");
                 cargarCombos();
                 btnConsultarActionPerformed(evt);
+            } else {
+                JOptionPane.showMessageDialog(this, "No se puede eliminar: Verifique que no tenga ciudades o idiomas asociados.");
             }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "No se puede eliminar: Es posible que tenga ciudades o idiomas asociados.");
         }        // TODO add your handling code here:
     }//GEN-LAST:event_btnEliminarActionPerformed
 
@@ -471,55 +470,46 @@ PaisDAO dao = new PaisDAO();
     }//GEN-LAST:event_btnCrearActionPerformed
 
     private void btnModificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModificarActionPerformed
-try {
-            Connection con = ConexionDB.getInstancia();
-            
-            String sql = "UPDATE Pais SET nombrePais=?, continentePais=?, poblacionPais=?, tipoGobierno=? WHERE codigoPais=?";
-            PreparedStatement pst = con.prepareStatement(sql);
-            
-            pst.setString(1, txtNombre.getText());
-            pst.setString(2, cboxContinente.getSelectedItem().toString());
-            pst.setInt(3, Integer.parseInt(txtPoblacion.getText()));
-            pst.setBoolean(4, chkTipoGobierno.isSelected());
-            pst.setString(5, txtCodigo.getText());
-            
-            int filasAfectadas = pst.executeUpdate();
-            if (filasAfectadas > 0) {
-                JOptionPane.showMessageDialog(this, "País modificado correctamente.");
-                btnConsultarActionPerformed(evt);
-            } else {
-                JOptionPane.showMessageDialog(this, "No se encontró el código de país para modificar.");
-            }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error al modificar: " + e.getMessage());
+Pais p = new Pais();
+        p.setCodigoPais(txtCodigo.getText());
+        p.setNombrePais(txtNombre.getText());
+        p.setContinentePais(cboxContinente.getSelectedItem().toString());
+        
+        try {
+            p.setPoblacionPais(Integer.parseInt(txtPoblacion.getText()));
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "La población debe ser un número.");
+            return;
+        }
+        
+        p.setTipoGobierno(chkTipoGobierno.isSelected());
+
+
+        PaisDAO dao = new PaisDAO();
+        if (dao.modificar(p)) {
+            JOptionPane.showMessageDialog(this, "País modificado correctamente.");
+            cargarCombos();
+            btnConsultarActionPerformed(evt);
+        } else {
+            JOptionPane.showMessageDialog(this, "No se pudo modificar (¿Existe el código?).");
         }
     }//GEN-LAST:event_btnModificarActionPerformed
 
     private void btnConsultarIdiomaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConsultarIdiomaActionPerformed
-try {
-            Connection con = ConexionDB.getInstancia();
+String paisSeleccionado = jComboBox2.getSelectedItem().toString();
+        
+        IdiomaDAO dao = new IdiomaDAO();
+        List<Idioma> lista = dao.listarPorPais(paisSeleccionado);
+        
+        DefaultTableModel modelo = (DefaultTableModel) jTableCiudades1.getModel();
+        modelo.setRowCount(0);
+        
+        for (Idioma i : lista) {
+            Object[] fila = new Object[2];
+            fila[0] = i.getNombreIdioma();
 
-            String sql = "SELECT i.nombreIdioma, i.oficial FROM Idioma i " +
-                         "INNER JOIN Pais p ON i.codigoPais = p.codigoPais " +
-                         "WHERE p.nombrePais = ?";
-            
-            PreparedStatement pst = con.prepareStatement(sql);
-            pst.setString(1, jComboBox2.getSelectedItem().toString());
-            
-            ResultSet rs = pst.executeQuery();
-            
-            DefaultTableModel modelo = (DefaultTableModel) jTableCiudades1.getModel();
-            modelo.setRowCount(0);
-            
-            while (rs.next()) {
-                Object[] fila = new Object[2];
-                fila[0] = rs.getString("nombreIdioma");
-
-                fila[1] = rs.getBoolean("oficial") ? "Sí" : "No";
-                modelo.addRow(fila);
-            }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error al consultar idiomas: " + e.getMessage());
+            fila[1] = i.isOficial() ? "Sí" : "No"; 
+            modelo.addRow(fila);
         }        // TODO add your handling code here:
     }//GEN-LAST:event_btnConsultarIdiomaActionPerformed
     /**

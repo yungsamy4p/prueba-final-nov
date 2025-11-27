@@ -40,7 +40,6 @@ public class ConexionDB {
         }
     }
     
-    // Método para obtener la instancia única
     public static Connection getInstancia() throws SQLException {
         if (conn == null || conn.isClosed()) {
             new ConexionDB();
@@ -48,7 +47,6 @@ public class ConexionDB {
         return conn;
     }
 
-    // Cierre
     public static void close() {
         try {
             if (conn != null && !conn.isClosed()) {
