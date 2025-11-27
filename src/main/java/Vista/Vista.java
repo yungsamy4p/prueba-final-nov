@@ -11,14 +11,13 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 
-
 public class Vista extends javax.swing.JFrame {
 
     public Vista() {
         initComponents();
         cargarCombos(); 
     }
-    
+
 private void cargarCombos() {
         PaisDAO dao = new PaisDAO();
         List<Pais> lista = dao.listar();
@@ -105,6 +104,8 @@ private void cargarCombos() {
 
         jLabel3.setText("Nombre");
 
+        btnModificar.setBackground(new java.awt.Color(102, 102, 255));
+        btnModificar.setForeground(new java.awt.Color(255, 255, 255));
         btnModificar.setText("Modificar");
         btnModificar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -116,6 +117,7 @@ private void cargarCombos() {
 
         jLabel5.setText("Población");
 
+        jTablePais.setBackground(new java.awt.Color(255, 204, 255));
         jTablePais.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null},
@@ -137,6 +139,7 @@ private void cargarCombos() {
         jLabel1.setFont(new java.awt.Font("Microsoft Sans Serif", 0, 18)); // NOI18N
         jLabel1.setText("Registro Poblacional Internacional");
 
+        btnCrear.setBackground(new java.awt.Color(204, 204, 255));
         btnCrear.setText("Agregar");
         btnCrear.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -146,6 +149,7 @@ private void cargarCombos() {
 
         jLabel2.setText("Código");
 
+        btnConsultar.setBackground(new java.awt.Color(153, 153, 255));
         btnConsultar.setText("Consultar");
         btnConsultar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -153,6 +157,8 @@ private void cargarCombos() {
             }
         });
 
+        btnEliminar.setBackground(new java.awt.Color(51, 51, 255));
+        btnEliminar.setForeground(new java.awt.Color(255, 255, 255));
         btnEliminar.setText("Eliminar");
         btnEliminar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
